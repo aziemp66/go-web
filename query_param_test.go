@@ -31,17 +31,17 @@ func TestQueryParameter(t *testing.T) {
 }
 
 func SayHelloMultipleParameter(w http.ResponseWriter, r *http.Request) {
-	first_name := r.URL.Query().Get("first_name")
-	last_name := r.URL.Query().Get("last_name")
+	firstName := r.URL.Query().Get("first_name")
+	lastName := r.URL.Query().Get("last_name")
 
-	if first_name == "" && last_name == "" {
+	if firstName == "" && lastName == "" {
 		fmt.Fprint(w, "Hello")
-	} else if first_name == "" {
-		fmt.Fprintf(w, "Hello %s", last_name)
-	} else if last_name == "" {
-		fmt.Fprintf(w, "Hello %s", first_name)
+	} else if firstName == "" {
+		fmt.Fprintf(w, "Hello %s", lastName)
+	} else if lastName == "" {
+		fmt.Fprintf(w, "Hello %s", firstName)
 	} else {
-		fmt.Fprintf(w, "Hello %s %s", first_name, last_name)
+		fmt.Fprintf(w, "Hello %s %s", firstName, lastName)
 	}
 }
 
