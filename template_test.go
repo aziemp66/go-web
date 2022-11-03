@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"text/template"
 )
@@ -160,6 +161,54 @@ func TemplateLayout(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type MyPage struct {
+	Name string
+}
+
+func (myPage MyPage) SayHello(name string) string {
+	return "Hello " + name + ", My Name Is " + myPage.Name
+}
+
+func TemplateFunction(writer http.ResponseWriter, request *http.Request) {
+	t := template.Must(template.ParseFiles("./templates/function.gohtml"))
+	t.ExecuteTemplate(writer, "function.gohtml", MyPage{
+		Name: "Eko",
+	})
+}
+
+func TemplateFunctionGlobal(w http.ResponseWriter, r *http.Request) {
+	t := template.New("function")
+	t = t.Funcs(map[string]any{
+		"upper": func(value string) string {
+			return strings.ToUpper(value)
+		},
+	})
+	t = template.Must(t.Parse(`{{upper .Name}}`))
+
+	t.ExecuteTemplate(w, "function", MyPage{
+		Name: "Melza",
+	})
+}
+
+func TemplateFunctionPipelines(w http.ResponseWriter, r *http.Request) {
+	t := template.New("FUNCTION")
+	t = t.Funcs(map[string]any{
+		"upper": func(value string) string {
+			return strings.ToUpper(value)
+		},
+		"sayHello": func(value string) string {
+			return "Hello " + value
+		},
+	})
+
+	t = template.Must(t.Parse(`{{sayHello .Name | upper}}`))
+
+	t.ExecuteTemplate(w, "FUNCTION", MyPage{
+		Name: "Melza",
+	})
+
+}
+
 func TestTemplateAction(t *testing.T) {
 	mux := http.NewServeMux()
 
@@ -168,6 +217,9 @@ func TestTemplateAction(t *testing.T) {
 	mux.HandleFunc("/range", TemplateRange)
 	mux.HandleFunc("/with", TemplateWith)
 	mux.HandleFunc("/layout", TemplateLayout)
+	mux.HandleFunc("/function", TemplateFunction)
+	mux.HandleFunc("/functionglobal", TemplateFunctionGlobal)
+	mux.HandleFunc("/functionpipelines", TemplateFunctionPipelines)
 
 	server := http.Server{
 		Addr:    "localhost:5000",
