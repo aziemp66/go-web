@@ -209,6 +209,15 @@ func TemplateFunctionPipelines(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//go:embed templates/*.gohtml
+var TemplatesCaching embed.FS
+
+var myTemplates = template.Must(template.ParseFS(TemplatesCaching, "templates/*.gohtml"))
+
+func TemplatesCachingFunction(w http.ResponseWriter, r *http.Request) {
+	myTemplates.ExecuteTemplate(w, "simple.gohtml", "Hello HTML Template")
+}
+
 func TestTemplateAction(t *testing.T) {
 	mux := http.NewServeMux()
 
@@ -220,6 +229,7 @@ func TestTemplateAction(t *testing.T) {
 	mux.HandleFunc("/function", TemplateFunction)
 	mux.HandleFunc("/functionglobal", TemplateFunctionGlobal)
 	mux.HandleFunc("/functionpipelines", TemplateFunctionPipelines)
+	mux.HandleFunc("/cache", TemplatesCachingFunction)
 
 	server := http.Server{
 		Addr:    "localhost:5000",
