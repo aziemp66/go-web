@@ -106,3 +106,57 @@ func TestTemplateDataStruct(t *testing.T) {
 	body, _ := io.ReadAll(recorder.Result().Body)
 	fmt.Println(string(body))
 }
+
+func TemplateIf(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("./templates/if.gohtml"))
+
+	t.ExecuteTemplate(w, "if.gohtml", map[string]interface{}{
+		"Name": "Azie",
+	})
+}
+
+func TemplateComparator(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("./templates/comparator.gohtml"))
+
+	t.ExecuteTemplate(w, "comparator.gohtml", map[string]interface{}{
+		"FinalValue": 100,
+	})
+}
+
+func TemplateRange(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("./templates/range.gohtml"))
+
+	t.ExecuteTemplate(w, "range.gohtml", map[string]interface{}{
+		"Hobbies": []string{
+			"Gaming", "Ngoding", "Reading",
+		},
+	})
+}
+
+func TemplateWith(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("./templates/with.gohtml"))
+
+	t.ExecuteTemplate(w, "with.gohtml", map[string]interface{}{
+		"Name": "Azie",
+		"Address": map[string]interface{}{
+			"Street": "Sukadana",
+			"City":   "Kayuagung",
+		},
+	})
+}
+
+func TestTemplateAction(t *testing.T) {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/if", TemplateIf)
+	mux.HandleFunc("/comparator", TemplateComparator)
+	mux.HandleFunc("/range", TemplateRange)
+	mux.HandleFunc("/with", TemplateWith)
+
+	server := http.Server{
+		Addr:    "localhost:5000",
+		Handler: mux,
+	}
+
+	server.ListenAndServe()
+}
