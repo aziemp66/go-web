@@ -145,6 +145,21 @@ func TemplateWith(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func TemplateLayout(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(
+		template.ParseFiles(
+			"./templates/header.gohtml",
+			"./templates/footer.gohtml",
+			"./templates/layout.gohtml",
+		),
+	)
+
+	t.ExecuteTemplate(w, "layout", map[string]any{
+		"Name":  "Azie",
+		"Title": "Template Layout",
+	})
+}
+
 func TestTemplateAction(t *testing.T) {
 	mux := http.NewServeMux()
 
@@ -152,6 +167,7 @@ func TestTemplateAction(t *testing.T) {
 	mux.HandleFunc("/comparator", TemplateComparator)
 	mux.HandleFunc("/range", TemplateRange)
 	mux.HandleFunc("/with", TemplateWith)
+	mux.HandleFunc("/layout", TemplateLayout)
 
 	server := http.Server{
 		Addr:    "localhost:5000",
