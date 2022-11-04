@@ -3,12 +3,12 @@ package goweb
 import (
 	"embed"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"text/template"
 )
 
 func SimpleHTML(w http.ResponseWriter, r *http.Request) {
